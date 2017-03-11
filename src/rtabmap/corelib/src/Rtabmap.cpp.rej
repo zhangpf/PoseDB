@@ -1,0 +1,32 @@
+--- corelib/src/Rtabmap.cpp
++++ corelib/src/Rtabmap.cpp
+@@ -128,7 +128,10 @@
+ 	_pathCurrentIndex(0),
+ 	_pathGoalIndex(0),
+ 	_pathTransformToGoal(Transform::getIdentity()),
+-	_pathStuckCount(0)
++	_pathStuckCount(0),
++	_poseEnabled(true),
++	_poseSpace(0),
++	_poseNNSize(Parameters::defaultPoseNNSize())
+ {
+ }
+ 
+@@ -1024,7 +1042,7 @@
+ 				}
+ 			}
+ 			else
+-			{
++			{
+ 				//============================================================
+ 				// Refine neighbor links
+ 				//============================================================
+@@ -1077,7 +1095,7 @@
+ 				}
+ 			}
+ 			timeNeighborLinkRefining = timer.ticks();
+-			ULOGGER_INFO("timeOdometryRefining=%fs", timeNeighborLinkRefining);
++			ULOGGER_INFO("timeOdometryRefining=%fs", timeNeighborLinkRefining);
+ 
+ 			UASSERT(oldS->hasLink(signature->id()));
+ 			UASSERT(uContains(_optimizedPoses, oldId));

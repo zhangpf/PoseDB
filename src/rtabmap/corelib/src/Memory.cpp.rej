@@ -1,0 +1,96 @@
+--- corelib/src/Memory.cpp
++++ corelib/src/Memory.cpp
+@@ -451,7 +451,7 @@
+ 	else if(_feature2D)
+ 	{
+ 		_feature2D->parseParameters(parameters);
+-	}
++	}
+ 
+ 	Registration::Type regStrategy = Registration::kTypeUndef;
+ 	if((iter=parameters.find(Parameters::kRegStrategy())) != parameters.end())
+@@ -478,29 +478,29 @@
+ 	{
+ 		_registrationIcp->parseParameters(parameters);
+ 	}
+-
+-	// do this after all parameters are parsed
+-	// SLAM mode vs Localization mode
+-	iter = parameters.find(Parameters::kMemIncrementalMemory());
+-	if(iter != parameters.end())
+-	{
+-		bool value = uStr2Bool(iter->second.c_str());
+-		if(value == false && _incrementalMemory)
+-		{
+-			// From SLAM to localization, change map id
+-			this->incrementMapId();
+-
+-			// The easiest way to make sure that the mapping session is saved
+-			// is to save the memory in the database and reload it.
+-			if((_memoryChanged || _linksChanged) && _dbDriver)
+-			{
+-				UWARN("Switching from Mapping to Localization mode, the database will be saved and reloaded.");
++
++	// do this after all parameters are parsed
++	// SLAM mode vs Localization mode
++	iter = parameters.find(Parameters::kMemIncrementalMemory());
++	if(iter != parameters.end())
++	{
++		bool value = uStr2Bool(iter->second.c_str());
++		if(value == false && _incrementalMemory)
++		{
++			// From SLAM to localization, change map id
++			this->incrementMapId();
++
++			// The easiest way to make sure that the mapping session is saved
++			// is to save the memory in the database and reload it.
++			if((_memoryChanged || _linksChanged) && _dbDriver)
++			{
++				UWARN("Switching from Mapping to Localization mode, the database will be saved and reloaded.");
+ 				this->init(_dbDriver->getUrl());
+-				UWARN("Switching from Mapping to Localization mode, the database is reloaded!");
+-			}
+-		}
+-		_incrementalMemory = value;
+-	}
++				UWARN("Switching from Mapping to Localization mode, the database is reloaded!");
++			}
++		}
++		_incrementalMemory = value;
++	}
+ }
+ 
+ void Memory::preUpdate()
+@@ -1338,8 +1338,22 @@
+  * Important: Assuming that all other ids are under 'signature' id.
+  * If an error occurs, the result is empty.
+  */
+-std::map<int, float> Memory::computeLikelihood(const Signature * signature, const std::list<int> & ids)
++std::map<int, float> Memory::computeLikelihood(const Signature * signature, 
++	const std::list<int> & inputIds, const std::list<int> * idsToLoad)
+ {
++	std::list<Signature *> loadedSigns;
++	std::map<int, Signature *> id2Sign;
++	std::list<int> ids(inputIds.begin(), inputIds.end());
++	if(_dbDriver && idsToLoad)
++	{
++		_dbDriver->loadSignatures(*idsToLoad, loadedSigns);
++		for (std::list<Signature *>::iterator it = loadedSigns.begin(); it != loadedSigns.end(); it ++) {
++			int id = (*it)->id();
++			ids.push_back(id);
++			id2Sign[id] = *it;
++		}
++	}	
++
+ 	if(!_tfIdfLikelihoodUsed)
+ 	{
+ 		UTimer timer;
+@@ -3645,7 +3659,7 @@
+ 
+ 	t = timer.ticks();
+ 	if(stats) stats->addStatistic(Statistics::kTimingMemCompressing_data(), t*1000.0f);
+-	UDEBUG("time compressing data (id=%d) %fs", id, t);
++	UINFO("time compressing data (id=%d) %d %fs", id, s->id(), t);
+ 	if(words.size())
+ 	{
+ 		s->setEnabled(true); // All references are already activated in the dictionary at this point (see _vwd->addNewWords())

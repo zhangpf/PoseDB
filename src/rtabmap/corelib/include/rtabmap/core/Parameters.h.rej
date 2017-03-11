@@ -1,0 +1,11 @@
+--- corelib/include/rtabmap/core/Parameters.h
++++ corelib/include/rtabmap/core/Parameters.h
+@@ -174,7 +174,7 @@
+ 	RTABMAP_PARAM(Rtabmap, PublishLikelihood, 	         bool, true, "Publishing likelihood.");
+ 	RTABMAP_PARAM(Rtabmap, TimeThr, 		             float, 0.0, "Maximum time allowed for the detector (ms) (0 means infinity).");
+ 	RTABMAP_PARAM(Rtabmap, MemoryThr, 		             int, 0, 	 "Maximum signatures in the Working Memory (ms) (0 means infinity).");
+-	RTABMAP_PARAM(Rtabmap, DetectionRate,                float, 1.0, "Detection rate. RTAB-Map will filter input images to satisfy this rate.");
++	RTABMAP_PARAM(Rtabmap, DetectionRate,                float, 10.0, "Detection rate. RTAB-Map will filter input images to satisfy this rate.");
+ 	RTABMAP_PARAM(Rtabmap, ImageBufferSize,              unsigned int, 1, "Data buffer size (0 min inf).");
+ 	RTABMAP_PARAM(Rtabmap, CreateIntermediateNodes,      bool, false, "Create intermediate nodes between loop closure detection. Only used when Rtabmap/DetectionRate>0.");
+ 	RTABMAP_PARAM_STR(Rtabmap, WorkingDirectory,         "", "Working directory.");
